@@ -28,6 +28,10 @@ button, input { font: inherit; }
 .crossword-cell--blank { background: transparent; }
 .clue-carousel { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; width: min(100%, 48rem); justify-self: center; gap: .75rem; min-width: 0; }
 .clue-viewport { min-width: 0; overflow: hidden; touch-action: pan-y; user-select: none; }
+.clue-toolbar { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: 0 0 .75rem; color: #476152; font-size: .85rem; font-weight: 700; }
+.new-crossword-button { padding: .55rem .8rem; border: 1px solid #0c5a3f; border-radius: .55rem; background: #0c5a3f; color: #fff; font-size: .8rem; font-weight: 800; cursor: pointer; transition: background .2s ease, transform .2s ease; }
+.new-crossword-button:hover { background: #0b402d; transform: translateY(-1px); }
+.new-crossword-button:focus-visible { outline: 3px solid #e4983c; outline-offset: 2px; }
 .clue-card { min-height: 12rem; padding: 1.5rem; border: 1px solid #e4ece6; border-radius: 1rem; background: #f8fbf8; animation: reveal-clue .28s ease-out; }
 .clue-number { margin: 0 0 .75rem; color: #b24f1b; font-size: .8rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .clue-question { margin: 0 0 1rem; color: #163c2b; font-size: clamp(1.05rem, 2vw, 1.25rem); font-weight: 700; line-height: 1.45; }
@@ -47,5 +51,6 @@ button, input { font: inherit; }
   .app-shell { padding: 2rem 0; }
   .daily-crossword { padding: 1.25rem; gap: 1.25rem; }
   .crossword-grid { --cell-size: clamp(1.8rem, 8vw, 2.35rem); }
+  .clue-toolbar { align-items: flex-start; flex-direction: column; }
   .clue-card { min-height: 10rem; padding: 1.25rem; }
 }
