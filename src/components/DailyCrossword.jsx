@@ -40,6 +40,18 @@ export function DailyCrossword({ questions, date, level }) {
     if (letter) focusNextCell(row, col);
   };
 
+  const eraseLastLetter = () => {
+    const [rowStep, colStep] = activeWord.direction === 'vertical' ? [1, 0] : [0, 1];
+    const positions = Array.from({ length: activeWord.length }, (_, index) => ({
+      row: activeWord.row + rowStep * index,
+      col: activeWord.col + colStep * index,
+    }));
+    const target = [...positions].reverse().find(({ row, col }) => enteredLetters[cellKey(row, col)]) ?? positions[0];
+    const targetKey = cellKey(target.row, target.col);
+    setEnteredLetters((letters) => ({ ...letters, [targetKey]: '' }));
+    cellRefs.current.get(targetKey)?.focus();
+  };
+
   const handlePointerDown = (event) => {
     pointerStart.current = event.clientX;
   };
@@ -53,6 +65,9 @@ export function DailyCrossword({ questions, date, level }) {
 
   const activeWord = crossword.words[currentClue];
   const directionLabel = activeWord.direction === 'horizontal' ? 'Horizontal →' : 'Vertical ↓';
+  const [rowStep, colStep] = activeWord.direction === 'vertical' ? [1, 0] : [0, 1];
+  const activeCellKeys = new Set(Array.from({ length: activeWord.length }, (_, index) => cellKey(activeWord.row + rowStep * index, activeWord.col + colStep * index)));
+  const isComplete = crossword.grid.every((row, rowIndex) => row.every((solutionLetter, colIndex) => !solutionLetter || enteredLetters[cellKey(rowIndex, colIndex)] === solutionLetter));
   return <section className="daily-crossword" aria-label="Crucigrama diario">
     <div className="crossword-board" aria-label="Cuadrícula del crucigrama">
       <div
@@ -65,7 +80,7 @@ export function DailyCrossword({ questions, date, level }) {
           return solutionLetter ? (
             <input
               key={key}
-              className={`crossword-cell${enteredLetter ? ' crossword-cell--filled' : ''}${enteredLetter && enteredLetter !== solutionLetter ? ' crossword-cell--incorrect' : ''}`}
+              className={`crossword-cell${activeCellKeys.has(key) ? ' crossword-cell--active' : ''}${enteredLetter ? ' crossword-cell--filled' : ''}${enteredLetter && enteredLetter !== solutionLetter ? ' crossword-cell--incorrect' : ''}`}
               type="text"
               inputMode="text"
               autoComplete="off"
@@ -88,7 +103,10 @@ export function DailyCrossword({ questions, date, level }) {
       <div className="clue-viewport" onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { pointerStart.current = null; }}>
         <div className="clue-toolbar">
           <span>Resuelve las 4 pistas</span>
-          <button className="new-crossword-button" type="button" onClick={() => setPuzzleVersion((version) => version + 1)}>Nuevo crucigrama</button>
+          <div className="clue-actions">
+            <button className="erase-button" type="button" onClick={eraseLastLetter}>Borrar letra</button>
+            <button className="new-crossword-button" type="button" onClick={() => setPuzzleVersion((version) => version + 1)}>Nuevo crucigrama</button>
+          </div>
         </div>
         <article className="clue-card" key={activeWord.id}>
           <p className="clue-number">Pregunta {currentClue + 1} de {crossword.words.length}</p>
@@ -104,5 +122,9 @@ export function DailyCrossword({ questions, date, level }) {
       </div>
       <button className="carousel-control" type="button" onClick={() => changeClue(1)} aria-label="Pregunta siguiente">→</button>
     </section>
+    {isComplete && <div className="victory-message" role="status" aria-live="polite">
+      <span aria-hidden="true">⚽</span>
+      <div><strong>¡Golazo!</strong><p>Completaste el crucigrama.</p></div>
+    </div>}
   </section>;
 }
